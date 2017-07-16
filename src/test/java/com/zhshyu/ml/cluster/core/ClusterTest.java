@@ -3,8 +3,6 @@ package com.zhshyu.ml.cluster.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.panayotis.gnuplot.JavaPlot;
-
 import junit.framework.TestCase;
 
 public class ClusterTest extends TestCase {
