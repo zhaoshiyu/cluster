@@ -48,7 +48,7 @@ public class DBSCAN extends Clusterer {
 			if (visited.get(point) != null) {
 				continue;
 			}
-			final List<Point> neighbors = getNeighbors(point, points);
+			final List<Point> neighbors = neighbors(point, points);
 			if (neighbors.size() >= minPoints) {
 				final Cluster cluster = new Cluster();
 				clusters.add(expandCluster(cluster, point, neighbors, points, visited));
@@ -72,7 +72,7 @@ public class DBSCAN extends Clusterer {
 			PointStatus pStatus = visited.get(current);
 			// only check non-visited points
 			if (pStatus == null) {
-				final List<Point> currentNeighbors = getNeighbors(current, points);
+				final List<Point> currentNeighbors = neighbors(current, points);
 				if (currentNeighbors.size() >= minPoints) {
 					seeds = merge(seeds, currentNeighbors);
 				}
@@ -88,7 +88,7 @@ public class DBSCAN extends Clusterer {
 		return cluster;
 	}
 	
-	private List<Point> getNeighbors(final Point point, final Collection<Point> points) {
+	private List<Point> neighbors(final Point point, final Collection<Point> points) {
 		final List<Point> neighbors = new ArrayList<Point>();
 		for (final Point neighbor : points) {
 			if (point != neighbor && distance(neighbor, point) <= epsilon) {
