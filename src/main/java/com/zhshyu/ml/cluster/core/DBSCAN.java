@@ -70,7 +70,6 @@ public class DBSCAN extends Clusterer {
 		while (index < seeds.size()) {
 			final Point current = seeds.get(index);
 			PointStatus pStatus = visited.get(current);
-			// only check non-visited points
 			if (pStatus == null) {
 				final List<Point> currentNeighbors = neighbors(current, points);
 				if (currentNeighbors.size() >= minPoints) {
