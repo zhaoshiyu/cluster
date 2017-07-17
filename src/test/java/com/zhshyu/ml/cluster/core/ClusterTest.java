@@ -3,6 +3,9 @@ package com.zhshyu.ml.cluster.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zhshyu.copy.ml.cluster.core.Clustering;
+import com.zhshyu.copy.ml.cluster.core.MeanShift;
+
 import junit.framework.TestCase;
 
 public class ClusterTest extends TestCase {
@@ -156,6 +159,30 @@ public class ClusterTest extends TestCase {
 			
 		}
 	}
+	
+	
+	public void testMeanShift() {
+		Clustering mf = new MeanShift(2.0);
+		int len = data.length;
+		List<Point> points = new ArrayList<Point>();
+		for(int i = 0; i < len; ++i) {
+			points.add(new Point(data[i]));
+		}
+		
+		List<Cluster> clusters = mf.cluster(points);
+		
+		int clusterNum = 0;
+		for(Cluster cluster : clusters) {
+			List<Point> clusterPoints = cluster.getPoints();
+			int clusterLen = clusterPoints.size();
+			System.err.println("Cluster: " + clusterNum++);
+			for(int i = 0; i < clusterLen; ++i) {
+				System.err.println(clusterPoints.get(i));
+			}
+			
+		}
+	}
+
 
 	
 }
