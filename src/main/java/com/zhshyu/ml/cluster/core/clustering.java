@@ -7,9 +7,10 @@ import java.util.List;
  * 
  * @author Zhao Shiyu
  *
+ * @param <T>
  */
-public interface clustering {
+public interface Clustering<T extends Clusterable> {
 	
-	List<Cluster> cluster(Collection<Point> points);
+	List<Cluster<T>> cluster(Collection<T> points);
 	
 }

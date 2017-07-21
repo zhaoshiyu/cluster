@@ -2,11 +2,9 @@ package com.zhshyu.ml.cluster.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -14,8 +12,9 @@ import java.util.Set;
  * 
  * @author Zhao Shiyu
  *
+ * @param <T>
  */
-public class DBSCAN extends Clusterer {
+public class DBSCAN<T extends Clusterable> extends Clusterer<T> {
 
 	private final int minPoints;
 
@@ -34,72 +33,84 @@ public class DBSCAN extends Clusterer {
 		return epsilon;
 	}
 
-	private enum PointStatus {
-		NOISE,
-		PART_OF_CLUSTER
-	}
-
 	@Override
-	public List<Cluster> cluster(Collection<Point> points) {
-		final List<Cluster> clusters = new LinkedList<Cluster>();
-		final Map<Point, PointStatus> visited = new HashMap<Point, PointStatus>();
+	public List<Cluster<T>> cluster(Collection<T> points) {
+		final List<Cluster<T>> clusters = new LinkedList<Cluster<T>>();
 
-		for (final Point point : points) {
-			if (visited.get(point) != null) {
+		for (final T point : points) {
+			if (point.getStatus() != PointStatus.ORIGINAL) {
 				continue;
 			}
-			final List<Point> neighbors = neighbors(point, points);
+			final List<T> neighbors = neighbors(point, points);
 			if (neighbors.size() >= minPoints) {
-				final Cluster cluster = new Cluster();
-				clusters.add(expandCluster(cluster, point, neighbors, points, visited));
+				final Cluster<T> cluster = new Cluster<T>();
+				clusters.add(expandCluster(cluster, point, neighbors, points));
 			} else {
-				visited.put(point, PointStatus.NOISE);
+				point.setStatus(PointStatus.NOISE);
 			}
 		}
 
 		return clusters;
 	}
 
-	private Cluster expandCluster(final Cluster cluster, final Point point, final List<Point> neighbors,
-			final Collection<Point> points, final Map<Point, PointStatus> visited) {
-		cluster.addPoint(point);
-		visited.put(point, PointStatus.PART_OF_CLUSTER);
+	private Cluster<T> expandCluster(final Cluster<T> clusterTerm, final T point, final List<T> neighbors, final Collection<T> points) {
+		clusterTerm.addPoint(point);
+		point.setStatus(PointStatus.PART_OF_CLUSTER);
 
-		List<Point> seeds = new ArrayList<Point>(neighbors);
+		List<T> seeds = new ArrayList<T>(neighbors);
 		int index = 0;
 		while (index < seeds.size()) {
-			final Point current = seeds.get(index);
-			PointStatus pStatus = visited.get(current);
-			if (pStatus == null) {
-				final List<Point> currentNeighbors = neighbors(current, points);
+			final T current = seeds.get(index);
+			PointStatus pStatus = current.getStatus();
+			// only check non-visited points
+			if (pStatus == PointStatus.ORIGINAL) {
+				final List<T> currentNeighbors = neighbors(current, points);
 				if (currentNeighbors.size() >= minPoints) {
 					seeds = merge(seeds, currentNeighbors);
 				}
 			}
 
 			if (pStatus != PointStatus.PART_OF_CLUSTER) {
-				visited.put(current, PointStatus.PART_OF_CLUSTER);
-				cluster.addPoint(current);
+				current.setStatus(PointStatus.PART_OF_CLUSTER);
+				clusterTerm.addPoint(current);
 			}
 
 			index++;
 		}
-		return cluster;
+		return clusterTerm;
 	}
-	
-	private List<Point> neighbors(final Point point, final Collection<Point> points) {
-		final List<Point> neighbors = new ArrayList<Point>();
-		for (final Point neighbor : points) {
+
+	/**
+	 * Returns a list of density-reachable neighbors of a {@code point}.
+	 *
+	 * @param point
+	 *            the point to look for
+	 * @param points
+	 *            possible neighbors
+	 * @return the List of neighbors
+	 */
+	private List<T> neighbors(final T point, final Collection<T> points) {
+		final List<T> neighbors = new ArrayList<T>();
+		for (final T neighbor : points) {
 			if (point != neighbor && distance(neighbor, point) <= epsilon) {
 				neighbors.add(neighbor);
 			}
 		}
 		return neighbors;
 	}
-	
-	List<Point> merge(final List<Point> one, final List<Point> two) {
-		final Set<Point> oneSet = new HashSet<Point>(one);
-		for (Point item : two) {
+
+	/**
+	 * Merges two lists together.
+	 *
+	 * @param one
+	 *            first list
+	 * @param two
+	 *            second list
+	 * @return merged lists
+	 */
+	private List<T> merge(final List<T> one, final List<T> two) {
+		final Set<T> oneSet = new HashSet<T>(one);
+		for (T item : two) {
 			if (!oneSet.contains(item)) {
 				one.add(item);
 			}
