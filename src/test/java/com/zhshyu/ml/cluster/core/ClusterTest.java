@@ -2,12 +2,15 @@ package com.zhshyu.ml.cluster.core;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.zhshyu.copy.ml.cluster.core.Clustering;
-import com.zhshyu.copy.ml.cluster.core.MeanShift;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
+/**
+ * 
+ * @author Zhao Shiyu
+ *
+ */
 public class ClusterTest extends TestCase {
 	
 	private static double[][] data = new double[][] {
@@ -141,7 +144,7 @@ public class ClusterTest extends TestCase {
 	public void testDBSCAN() {
 		DBSCAN scan = new DBSCAN(4, 2.0);
 		int len = data.length;
-		List<Point> points = new ArrayList<Point>();
+		List<Point> points = new ArrayList<Point>(len);
 		for(int i = 0; i < len; ++i) {
 			points.add(new Point(data[i]));
 		}
@@ -158,11 +161,33 @@ public class ClusterTest extends TestCase {
 			}
 			
 		}
+		
+		Random random=new Random();
+		List<Point> tPoints = new ArrayList<Point>(len);
+		for(int i = 0; i < 100; ++i) {
+			tPoints.add(new Point(new double[]{random.nextDouble()}));
+		}
+		
+		DBSCAN tscan = new DBSCAN(4, 0.03);
+		List<Cluster> tclusters = tscan.cluster(tPoints);
+		
+		int tclusterNum = 0;
+		for(Cluster cluster : tclusters) {
+			List<Point> clusterPoints = cluster.getPoints();
+			int clusterLen = clusterPoints.size();
+			System.out.println("Cluster: " + tclusterNum++);
+			for(int i = 0; i < clusterLen; ++i) {
+				System.out.println(clusterPoints.get(i));
+			}
+			
+		}
+		
+		System.out.println(Double.doubleToLongBits(3.5465326256264));
 	}
 	
 	
 	public void testMeanShift() {
-		Clustering mf = new MeanShift(2.0);
+		Clustering mf = new MeanShift(1.0);
 		int len = data.length;
 		List<Point> points = new ArrayList<Point>();
 		for(int i = 0; i < len; ++i) {
