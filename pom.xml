@@ -4,35 +4,34 @@
 
 	<groupId>org.zsy.ml</groupId>
 	<artifactId>cluster</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0.RELEASE</version>
 	<packaging>jar</packaging>
 
 	<name>cluster</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/zhaoshiyu/cluster.git</url>
+
+	<developers>
+		<developer>
+			<name>Zhao Shiyu</name>
+			<email>shiyuzhaocn@outlook.com</email>
+			<url>https://github.com/zhaoshiyu</url>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache License Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<ejml.version>0.30</ejml.version>
-
-		<javaplot.version>0.5.0</javaplot.version>
 		<junit.version>4.12</junit.version>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.ejml</groupId>
-			<artifactId>simple</artifactId>
-			<version>${ejml.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.panayotis</groupId>
-			<artifactId>javaplot</artifactId>
-			<version>${javaplot.version}</version>
-			<scope>test</scope>
-		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
