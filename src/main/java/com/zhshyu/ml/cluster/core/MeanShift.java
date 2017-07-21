@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,9 +40,9 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	private List<Cluster<T>> cluster(List<T> points) {
 		int size = points.size();
-		//final List<T> shiftPoints = new ArrayList<T>(size);
 		final List<T> shiftPoints = deepCopy(points);
 		double maxMinDist = 1;
 		int iterationNumber = 0;
@@ -57,18 +56,15 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 				}
 				T pNew = shiftPoints.get(i);
 				T pNewStart = (T) pNew.clone();
-				//T pNewStart = points.get(i);
 				pNew = shiftPoint(pNew, points);
 				double dist = distance(pNew, pNewStart);
 				if(dist > maxMinDist) maxMinDist = dist;
 				if(dist < MIN_DISTANCE) {
 					pNew.setStatus(PointStatus.VISITED);
-					//data.set(i, pNewStart);
 				}
 				shiftPoints.set(i, pNew);
 				
 			}
-			//System.out.println("STEP: " + iterationNumber + "\tmaxMinDist: " + maxMinDist);
 			if((iterationNumber % 20000) == 0) System.out.println("STEP: " + iterationNumber + "\tmaxMinDist: " + maxMinDist);
 		}
 		return groupPoints(points, shiftPoints);
@@ -110,42 +106,10 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		}
 		return ret;
 	}
-	
-	private List<Cluster<T>> groupPoints(List<T> shiftPoints) {
-		if(shiftPoints == null) return null;
-		int size = shiftPoints.size();
-		//int[] groupAssignment = new int[size];
-		Map<Integer, Cluster<T>> groups = new HashMap<Integer, Cluster<T>>();
-		int groupIndex = 0;
-		Cluster<T> cluster;
-		for(int i = 0; i < size; ++i) {
-			T meanPoint = shiftPoints.get(i);
-			Integer nearestGroupIndex = determineNearestGroup(meanPoint, groups);
-			if(nearestGroupIndex == null) {
-				cluster = new Cluster<T>();
-				cluster.addPoint(meanPoint);
-				groups.put(groupIndex, cluster);
-				//groupAssignment[i] = groupIndex;
-				++groupIndex;
-			} else {
-				cluster = groups.get(nearestGroupIndex);
-				cluster.addPoint(meanPoint);
-				groups.put(nearestGroupIndex, cluster);
-				//groupAssignment[i] = nearestGroupIndex;
-			}
-		}
 		
-		List<Cluster<T>> clusters = new ArrayList<Cluster<T>>(groups.size());
-		for(Map.Entry<Integer, Cluster<T>> entry : groups.entrySet()) {
-			clusters.add(entry.getValue());
-		}
-		return clusters;
-	}
-	
 	private List<Cluster<T>> groupPoints(List<T> points, List<T> shiftPoints) {
 		if(shiftPoints == null) return null;
 		int size = shiftPoints.size();
-		//int[] groupAssignment = new int[size];
 		Map<Integer, Cluster<T>> groups = new HashMap<Integer, Cluster<T>>();
 		List<Cluster<T>> clusters = new LinkedList<Cluster<T>>();
 		int groupIndex = 0;
@@ -159,9 +123,7 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 				
 				++groupIndex;
 			} else {
-				//Cluster<T> cluster = new Cluster<T>();
 				clusters.get(nearestGroupIndex).addPoint(points.get(i));
-				//cluster.addPoint(points.get(i));
 				
 				groups.get(nearestGroupIndex).addPoint(points.get(i));
 				
@@ -191,22 +153,15 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return minDistance;
 	}
 	
-	private void checkDimensions(double[] pointA, double[] pointB) {
-		if (pointA.length != pointB.length) {
-			throw new IllegalArgumentException("Dimensions must agree.");
-		}
-	}
-	
-	//private <T> List<T> deepCopy(List<T> src) throws IOException, ClassNotFoundException {  
-	private <T> List<T> deepCopy(List<T> src) {
+	@SuppressWarnings("unchecked")
+	private List<T> deepCopy(List<T> points) {
 		List<T> dest = null;
 	    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();  
 	    ObjectOutputStream out;
 		try {
 			out = new ObjectOutputStream(byteOut);
-			out.writeObject(src);
+			out.writeObject(points);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	  
@@ -216,27 +171,11 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 			in = new ObjectInputStream(byteIn);
 			dest = (List<T>) in.readObject();  
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-	    //@SuppressWarnings("unchecked")  
-	    //List<T> dest = (List<T>) in.readObject();  
 	    return dest;  
-	} 
-	
-//	public static <T> List<T> deepCopy(List<T> src) throws IOException, ClassNotFoundException {  
-//	    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();  
-//	    ObjectOutputStream out = new ObjectOutputStream(byteOut);  
-//	    out.writeObject(src);  
-//	  
-//	    ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());  
-//	    ObjectInputStream in = new ObjectInputStream(byteIn);  
-//	    @SuppressWarnings("unchecked")  
-//	    List<T> dest = (List<T>) in.readObject();  
-//	    return dest;  
-//	} 
-	
+	}	
 		
 }

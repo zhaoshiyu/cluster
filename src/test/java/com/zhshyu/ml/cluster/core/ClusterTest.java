@@ -2,8 +2,6 @@ package com.zhshyu.ml.cluster.core;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
 import junit.framework.TestCase;
 
 /**
