@@ -155,34 +155,13 @@ public class ClusterTest extends TestCase {
 		for(Cluster cluster : clusters) {
 			List<Point> clusterPoints = cluster.getPoints();
 			int clusterLen = clusterPoints.size();
-			System.out.println("Cluster: " + clusterNum++);
+			System.out.println("DBSCAN Cluster: " + clusterNum++);
 			for(int i = 0; i < clusterLen; ++i) {
 				System.out.println(clusterPoints.get(i));
 			}
 			
 		}
 		
-		Random random=new Random();
-		List<Point> tPoints = new ArrayList<Point>(len);
-		for(int i = 0; i < 100; ++i) {
-			tPoints.add(new Point(new double[]{random.nextDouble()}));
-		}
-		
-		DBSCAN tscan = new DBSCAN(4, 0.03);
-		List<Cluster> tclusters = tscan.cluster(tPoints);
-		
-		int tclusterNum = 0;
-		for(Cluster cluster : tclusters) {
-			List<Point> clusterPoints = cluster.getPoints();
-			int clusterLen = clusterPoints.size();
-			System.out.println("Cluster: " + tclusterNum++);
-			for(int i = 0; i < clusterLen; ++i) {
-				System.out.println(clusterPoints.get(i));
-			}
-			
-		}
-		
-		System.out.println(Double.doubleToLongBits(3.5465326256264));
 	}
 	
 	
@@ -200,7 +179,7 @@ public class ClusterTest extends TestCase {
 		for(Cluster cluster : clusters) {
 			List<Point> clusterPoints = cluster.getPoints();
 			int clusterLen = clusterPoints.size();
-			System.err.println("Cluster: " + clusterNum++);
+			System.err.println("MeanShift Cluster: " + clusterNum++);
 			for(int i = 0; i < clusterLen; ++i) {
 				System.err.println(clusterPoints.get(i));
 			}
