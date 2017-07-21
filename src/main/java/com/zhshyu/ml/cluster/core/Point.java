@@ -21,6 +21,9 @@ public class Point implements Clusterable, Serializable {
 	 */
 	private final double[] value;
 	
+	/**
+	 * point status
+	 */
 	private PointStatus status;
 	
 	public Point(double[] value) {
@@ -57,6 +60,9 @@ public class Point implements Clusterable, Serializable {
 		return Arrays.toString(value);
 	}
 	
+	/**
+	 * point clone
+	 */
 	public Point clone() {
 		int len = value.length;
 		double[] newValue = new double[len];
