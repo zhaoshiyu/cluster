@@ -140,17 +140,17 @@ public class ClusterTest extends TestCase {
 	
 		
 	public void testDBSCAN() {
-		DBSCAN scan = new DBSCAN(4, 2.0);
+		Clustering<Point> scan = new DBSCAN<Point>(4, 2.0);
 		int len = data.length;
 		List<Point> points = new ArrayList<Point>(len);
 		for(int i = 0; i < len; ++i) {
 			points.add(new Point(data[i]));
 		}
 		
-		List<Cluster> clusters = scan.cluster(points);
+		List<Cluster<Point>> clusters = scan.cluster(points);
 		
 		int clusterNum = 0;
-		for(Cluster cluster : clusters) {
+		for(Cluster<Point> cluster : clusters) {
 			List<Point> clusterPoints = cluster.getPoints();
 			int clusterLen = clusterPoints.size();
 			System.out.println("DBSCAN Cluster: " + clusterNum++);
@@ -162,19 +162,18 @@ public class ClusterTest extends TestCase {
 		
 	}
 	
-	
 	public void testMeanShift() {
-		Clustering mf = new MeanShift(1.0);
+		Clustering<Point> mf = new MeanShift<Point>(1.0);
 		int len = data.length;
 		List<Point> points = new ArrayList<Point>();
 		for(int i = 0; i < len; ++i) {
 			points.add(new Point(data[i]));
 		}
 		
-		List<Cluster> clusters = mf.cluster(points);
+		List<Cluster<Point>> clusters = mf.cluster(points);
 		
 		int clusterNum = 0;
-		for(Cluster cluster : clusters) {
+		for(Cluster<Point> cluster : clusters) {
 			List<Point> clusterPoints = cluster.getPoints();
 			int clusterLen = clusterPoints.size();
 			System.err.println("MeanShift Cluster: " + clusterNum++);
