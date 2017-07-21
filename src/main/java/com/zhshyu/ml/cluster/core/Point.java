@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author Zhao Shiyu
  *
  */
-public class Point implements Serializable {
+public class Point implements Clusterable, Serializable {
 	
 	
 	/**
@@ -21,14 +21,32 @@ public class Point implements Serializable {
 	 */
 	private final double[] value;
 	
+	private PointStatus status;
+	
 	public Point(double[] value) {
-		this.value = value;
+		this(value, PointStatus.ORIGINAL);
 	}
 	
+	public Point(double[] value, PointStatus status) {
+		this.value = value;
+		this.status = status;
+	}
+
+	@Override
 	public double[] getValue() {
 		return value;
 	}
 	
+	@Override
+	public PointStatus getStatus() {
+		return status;
+	}
+	
+	@Override
+	public void setStatus(PointStatus status) {
+		this.status = status;
+	}
+
 	@Override
     public int hashCode() {
         return Arrays.hashCode(value);
@@ -37,6 +55,15 @@ public class Point implements Serializable {
 	@Override
 	public String toString() {
 		return Arrays.toString(value);
+	}
+	
+	public Point clone() {
+		int len = value.length;
+		double[] newValue = new double[len];
+		for(int i = 0; i < len; ++i) {
+			newValue[i] = value[i];
+		}
+		return new Point(newValue, status);
 	}
 
 }
