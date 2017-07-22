@@ -1,10 +1,6 @@
 package com.zhshyu.ml.cluster.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,11 +35,10 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return cluster((List<T>)points);
 	}
 	
-	
 	@SuppressWarnings("unchecked")
 	private List<Cluster<T>> cluster(List<T> points) {
+		final List<T> shiftPoints = copy(points);
 		int size = points.size();
-		final List<T> shiftPoints = deepCopy(points);
 		double maxMinDist = 1;
 		int iterationNumber = 0;
 		while(maxMinDist > MIN_DISTANCE && iterationNumber <= TOTAL_STEP) {
@@ -63,15 +58,13 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 					pNew.setStatus(PointStatus.VISITED);
 				}
 				shiftPoints.set(i, pNew);
-				
 			}
 			if((iterationNumber % 20000) == 0) System.out.println("STEP: " + iterationNumber + "\tmaxMinDist: " + maxMinDist);
 		}
 		return groupPoints(points, shiftPoints);
 	}
-
 	
-	private T shiftPoint(T point, List<T> points) {
+	private T shiftPoint(final T point, final List<T> points) {
 		int size = points.size();
 		int dataDim = point.getValue().length;
 		double[] distances = new double[size];
@@ -94,11 +87,11 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return point;
 	}
 	
-	private double gaussian(double distance, double bandwidth) {
+	private double gaussian(final double distance, final double bandwidth) {
 		return Math.exp(-0.5 * Math.pow(distance / bandwidth, 2)) / (bandwidth * Math.sqrt(2 * Math.PI));
 	}
 	
-	private double[] gaussian(double[] distances) {
+	private double[] gaussian(final double[] distances) {
 		int len = distances.length;
 		double[] ret = new double[len];
 		for(int i = 0; i < len; ++i) {
@@ -107,7 +100,7 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return ret;
 	}
 		
-	private List<Cluster<T>> groupPoints(List<T> points, List<T> shiftPoints) {
+	private List<Cluster<T>> groupPoints(final List<T> points, final List<T> shiftPoints) {
 		if(shiftPoints == null) return null;
 		int size = shiftPoints.size();
 		Map<Integer, Cluster<T>> groups = new HashMap<Integer, Cluster<T>>();
@@ -116,7 +109,7 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		for(int i = 0; i < size; ++i) {
 			T meanPoint = shiftPoints.get(i);
 			Integer nearestGroupIndex = determineNearestGroup(meanPoint, groups);
-			if(nearestGroupIndex == null) {
+			if(nearestGroupIndex == -1) {
 				clusters.add(groupIndex, new Cluster<T>(points.get(i)));
 				
 				groups.put(groupIndex, new Cluster<T>(meanPoint));
@@ -133,8 +126,8 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return clusters;
 	}
 		
-	private Integer determineNearestGroup(T meanPoint, Map<Integer, Cluster<T>> groups) {
-		Integer nearestGroupIndex = null;
+	private int determineNearestGroup(final T meanPoint, final Map<Integer, Cluster<T>> groups) {
+		int nearestGroupIndex = -1;
 		int index = 0;
 		for(Map.Entry<Integer, Cluster<T>> entry : groups.entrySet()) {
 			double minDistance = distance2Group(meanPoint, entry.getValue());
@@ -144,7 +137,7 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 		return nearestGroupIndex;
 	}
 	
-	private double distance2Group(T meanPoint, Cluster<T> cluster) {
+	private double distance2Group(final T meanPoint, final Cluster<T> cluster) {
 		double minDistance = Double.MAX_VALUE;
 		for(T pt : cluster.getPoints()) {
 			double dist = distance(meanPoint, pt);
@@ -154,28 +147,12 @@ public class MeanShift<T extends Clusterable> extends Clusterer<T> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<T> deepCopy(List<T> points) {
-		List<T> dest = null;
-	    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();  
-	    ObjectOutputStream out;
-		try {
-			out = new ObjectOutputStream(byteOut);
-			out.writeObject(points);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	  
-	    ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());  
-	    ObjectInputStream in;
-		try {
-			in = new ObjectInputStream(byteIn);
-			dest = (List<T>) in.readObject();  
-		} catch (IOException e) {
-			e.printStackTrace();
-		}  catch (ClassNotFoundException e) {
-			e.printStackTrace();
+	private List<T> copy(final List<T> points) {
+		final List<T> newPoints = new ArrayList<T>();
+		for(T point : points) {
+			newPoints.add((T)point.clone());
 		}
-	    return dest;  
-	}	
+		return newPoints;
+	}
 		
 }
